@@ -5,6 +5,7 @@ package com.onyx.miaosha.result;
  */
 public class CodeMsg {
 
+
     private int code;
     private String msg;
 
@@ -12,10 +13,24 @@ public class CodeMsg {
     public static CodeMsg SUCCESS=new CodeMsg(0,"success");
 
     public static CodeMsg SERVER_ERROR=new CodeMsg(500,"服务端异常");
+    public static CodeMsg PASSWORD_EMPTY=new CodeMsg(501,"密码不能为空");
+    public static CodeMsg MOBILE_EMPTY=new CodeMsg(502,"手机号不能为空");
+    public static CodeMsg MOBILE_ERROR=new CodeMsg(503,"手机号格式错误");
+    public static CodeMsg NO_USER = new CodeMsg(504,"用户不存在");
+    public static CodeMsg PASSWORD_ERROR = new CodeMsg(505,"密码错误");
+
+    public static CodeMsg BIND_ERROR = new CodeMsg(506,"绑定异常: %s");
 
     //登陆模块异常....600
     //商品模块...700
     //订单...800
+
+
+    public CodeMsg fillArgs(Object...args){
+        int code=this.code;
+        String message=String.format(this.msg,args);
+        return new CodeMsg(code,message);
+    }
 
     private CodeMsg(int code, String msg) {
         this.code=code;
