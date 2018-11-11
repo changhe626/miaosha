@@ -17,6 +17,7 @@ public class GlobalExceptionHandle {
     @ExceptionHandler(value = Exception.class)
     public Result<Object>  exceptionHandle(HttpServletRequest request,Exception e){
 
+        e.printStackTrace();
         if(e instanceof BindException){
             BindException bindException = (BindException) e;
             String message = bindException.getAllErrors().get(0).getDefaultMessage();

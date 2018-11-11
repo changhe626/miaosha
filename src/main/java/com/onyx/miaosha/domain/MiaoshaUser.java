@@ -2,7 +2,7 @@ package com.onyx.miaosha.domain;
 
 import java.util.Date;
 
-public class MiaohaUser {
+public class MiaoshaUser {
 
     private Long id;
     private String nickname;
@@ -15,7 +15,7 @@ public class MiaohaUser {
 
     @Override
     public String toString() {
-        return "MiaohaUser{" +
+        return "MiaoshaUser{" +
                 "id=" + id +
                 ", nickname='" + nickname + '\'' +
                 ", password='" + password + '\'' +

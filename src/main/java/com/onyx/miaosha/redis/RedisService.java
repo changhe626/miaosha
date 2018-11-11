@@ -53,10 +53,11 @@ public class RedisService {
             }
             //拼接上前缀
             int seconds = keyPrefix.expireSeconds();
+            String realKey = keyPrefix.getPrefix() + key;
             if(seconds>0){
-                jedis.set(keyPrefix.getPrefix()+key, s);
+                jedis.setex(realKey,seconds,s);
             }else {
-                jedis.setex(keyPrefix.getPrefix()+key,seconds,s);
+                jedis.set(realKey, s);
             }
         } finally {
             returnToPool(jedis);

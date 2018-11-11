@@ -1,6 +1,7 @@
 package com.onyx.miaosha.controller;
 
 
+import com.onyx.miaosha.redis.RedisService;
 import com.onyx.miaosha.result.Result;
 import com.onyx.miaosha.service.MiaoshaUserService;
 import com.onyx.miaosha.vo.LoginVo;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Controller
@@ -20,6 +23,7 @@ public class LoginController {
 
     @Autowired
     private MiaoshaUserService miaoshaUserService;
+
 
     private static Logger log= LoggerFactory.getLogger(LoginController.class);
 
@@ -32,7 +36,7 @@ public class LoginController {
 
     @PostMapping("/do_login")
     @ResponseBody
-    public Result<Object> login(@Valid LoginVo loginVo){
+    public Result<Object> login(@Valid LoginVo loginVo, HttpServletResponse response){
         log.info(loginVo.toString());
         System.out.println(loginVo.toString());
         //参数校验
@@ -59,7 +63,8 @@ public class LoginController {
             return Result.fail(msg);
         }*/
 
-        boolean login = miaoshaUserService.login(loginVo);
+        boolean login = miaoshaUserService.login(response,loginVo);
+        System.out.println("success");
         return Result.success(true);
 
     }
