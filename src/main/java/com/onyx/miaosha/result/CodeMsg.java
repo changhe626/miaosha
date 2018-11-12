@@ -21,6 +21,10 @@ public class CodeMsg {
 
     public static CodeMsg BIND_ERROR = new CodeMsg(506,"绑定异常: %s");
 
+    public static CodeMsg COUNT_EMPTY = new CodeMsg(507,"库存不足");
+
+    public static CodeMsg  MIAOSHA_FAIL= new CodeMsg(508,"不能进行重复秒杀");
+
     //登陆模块异常....600
     //商品模块...700
     //订单...800
@@ -42,12 +46,18 @@ public class CodeMsg {
         return code;
     }
 
-
-
     public String getMsg() {
         return msg;
     }
 
 
+    //注意需要重写toString 方法,不然到前端页面是一个对象的地址....
+    @Override
+    public String toString() {
+        return "CodeMsg{" +
+                "code=" + code +
+                ", msg='" + msg + '\'' +
+                '}';
+    }
 
 }
