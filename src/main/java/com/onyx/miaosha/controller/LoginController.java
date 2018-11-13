@@ -64,9 +64,9 @@ public class LoginController {
             return Result.fail(msg);
         }*/
 
-        boolean login = miaoshaUserService.login(response,loginVo);
+        String  token = miaoshaUserService.login(response,loginVo);
         System.out.println("success");
-        return Result.success(true);
+        return Result.success(token);
 
     }
 

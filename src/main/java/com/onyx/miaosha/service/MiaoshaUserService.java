@@ -34,7 +34,7 @@ public class MiaoshaUserService {
     }
 
     //public CodeMsg login(LoginVo loginVo) {
-    public boolean login(HttpServletResponse response,LoginVo loginVo) {
+    public String login(HttpServletResponse response,LoginVo loginVo) {
         if(loginVo==null){
             //return CodeMsg.SERVER_ERROR;
             //这样返回不好,出现了异常直接抛出去
@@ -63,7 +63,7 @@ public class MiaoshaUserService {
         //生成cookie ,写出去
         addCookie(response, token);
 
-        return true;
+        return token;
     }
 
     /**

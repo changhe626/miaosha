@@ -7,7 +7,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 @SpringBootApplication
 
-public class App  extends SpringBootServletInitializer {
+public class App  {
 
     public static void main(String[] args) {
         SpringApplication.run(App.class,args);
@@ -23,8 +23,5 @@ public class App  extends SpringBootServletInitializer {
      * ,@EnableAutoConfiguration和 @ComponentScan 并具有他们的默认属性值
      */
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-        return builder.sources(App.class);
-    }
+
 }

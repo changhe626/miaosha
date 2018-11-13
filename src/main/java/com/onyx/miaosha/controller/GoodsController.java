@@ -36,6 +36,7 @@ public class GoodsController {
      * 改进后,自动化进行Bean 的注入
      * @param model
      * @return
+     * 优化前: QPS  1267
      */
     @RequestMapping("to_list")
     public String toList(Model model, MiaoshaUser user){

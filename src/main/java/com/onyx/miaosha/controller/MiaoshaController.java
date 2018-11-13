@@ -30,7 +30,18 @@ public class MiaoshaController {
     //尽量不要在MiaoShaService中引入orderDao,这样结构不清晰,要么就引入orderService....
 
 
-    @RequestMapping(value = "do_miaosha",method = RequestMethod.POST)
+    /**
+     * 优化之前的TPS 是421...  1000个并发跑了10次
+     * 5000个用户...
+     * 数据库的秒杀数量变成了-44.....实际上就20上商品,创建了64个订单出来....程序出错了.
+     *
+     *
+     * @param user
+     * @param model
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "do_miaosha",method = RequestMethod.GET)
     public String miaoSha(MiaoshaUser user, Model model,@RequestParam("goodsId") long id){
         if(user==null){
             return "login/to_login";
