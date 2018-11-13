@@ -1,6 +1,7 @@
 package com.onyx.miaosha.controller;
 
 
+import com.onyx.miaosha.domain.MiaoshaUser;
 import com.onyx.miaosha.redis.RedisService;
 import com.onyx.miaosha.result.Result;
 import com.onyx.miaosha.service.MiaoshaUserService;
