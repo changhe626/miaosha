@@ -43,22 +43,25 @@ public class GoodsController {
      * 改进后,自动化进行Bean 的注入
      *
      * @param model
-     * @return 优化前: QPS  1267
+     * @return 优化前: QPS  529
+     *         优化后:  QPS  1200  还是有很大的进度的哈
      */
     @RequestMapping(value = "to_list", produces = "text/html")
     @ResponseBody
     public String toList(Model model, MiaoshaUser user,
                          HttpServletRequest request, HttpServletResponse response) {
         model.addAttribute("user", user);
-        List<GoodsVo> vos = goodsService.listGoodsVo();
-        model.addAttribute("goodsList", vos);
-        //return "goods_list";
 
         //取出缓存
         String html = redisService.get(GoodsKey.getGoodsList, "", String.class);
         if (html != null) {
             return html;
         }
+
+        List<GoodsVo> vos = goodsService.listGoodsVo();
+        model.addAttribute("goodsList", vos);
+        //return "goods_list";
+
         //为空,手动渲染
         IContext context = new SpringWebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap(), applicationContext);
         html = thymeleafViewResolver.getTemplateEngine().process("goods_list", context);

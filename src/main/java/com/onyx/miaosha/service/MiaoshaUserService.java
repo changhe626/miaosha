@@ -29,9 +29,47 @@ public class MiaoshaUserService {
 
 
     public MiaoshaUser getById(Long id){
-        MiaoshaUser user = miaoshaUserDao.getById(id);
+        //改造为对象级的缓存
+        MiaoshaUser user = redisService.get(MiaoshaUserKey.getById, id + "", MiaoshaUser.class);
+        if(user==null){
+            user = miaoshaUserDao.getById(id);
+            if(user!=null){
+                redisService.set(MiaoshaUserKey.getById,id+"",user);
+            }
+        }
         return user;
+        //MiaoshaUser user = miaoshaUserDao.getById(id);
+        //return user;
     }
+
+
+    /**
+     * 假设有个修改密码的功能
+     * @param id
+     * @param passward
+     * @return
+     */
+    public boolean  updateUserPass(String token,long id,String passward){
+        MiaoshaUser user = getById(id);
+        if(user==null){
+            throw new GlobalException(CodeMsg.NO_USER);
+        }
+        MiaoshaUser miaoshaUser = new MiaoshaUser();
+        miaoshaUser.setId(id);
+        miaoshaUser.setPassword(MD5Util.inputPassToFormPass(passward));
+        miaoshaUserDao.update(miaoshaUser);
+
+        //修改所有的用户的缓存
+        //更新token
+        user.setPassword(miaoshaUser.getPassword());
+        redisService.set(MiaoshaUserKey.token,token,user);
+
+        //先删除再修改
+        redisService.delete(MiaoshaUserKey.getById,id+"");
+        redisService.set(MiaoshaUserKey.getById,id+"",user);
+        return true;
+    }
+
 
     //public CodeMsg login(LoginVo loginVo) {
     public String login(HttpServletResponse response,LoginVo loginVo) {
