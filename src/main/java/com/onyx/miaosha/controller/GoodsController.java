@@ -7,6 +7,7 @@ import com.onyx.miaosha.redis.RedisService;
 import com.onyx.miaosha.result.Result;
 import com.onyx.miaosha.service.GoodsService;
 import com.onyx.miaosha.service.MiaoshaUserService;
+import com.onyx.miaosha.vo.GoodsDetail;
 import com.onyx.miaosha.vo.GoodsVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,9 +92,9 @@ public class GoodsController {
     }*/
 
 
-    @RequestMapping(value = "to_detail/{id}",produces = "text/html")
+    @RequestMapping(value = "to_detail2/{id}",produces = "text/html")
     @ResponseBody
-    public String detail(@PathVariable("id") long id,
+    public String detail2(@PathVariable("id") long id,
                          Model model, MiaoshaUser user,
                          HttpServletRequest request, HttpServletResponse response) {
 
@@ -140,6 +141,45 @@ public class GoodsController {
         }
 
         return html;
+    }
+
+
+    /**
+     * 页面静态化的修改
+     *
+     */
+    @RequestMapping(value = "detail/{id}")
+    @ResponseBody
+    public Result<Object> detail(@PathVariable("id") long id, MiaoshaUser user) {
+        GoodsVo good = goodsService.getById(id);
+
+        long start = good.getStartDate().getTime();
+        long end = good.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        int miaoshaStatus = 0;
+        long remainSeconds = 0;
+
+        if (now < start) {
+            //秒杀未开始
+            miaoshaStatus = 0;
+            remainSeconds = (long) (start - now) / 1000;
+        } else if (now > end) {
+            //秒杀结束
+            miaoshaStatus = 2;
+            remainSeconds = -1;
+        } else {
+            //进行中
+            miaoshaStatus = 1;
+            remainSeconds = 0;
+        }
+        GoodsDetail detail = new GoodsDetail();
+        detail.setGoods(good);
+        detail.setUser(user);
+        detail.setMiaoshaStatus(miaoshaStatus);
+        detail.setRemainSeconds(remainSeconds);
+
+        return Result.success(detail);
     }
 
 

@@ -4,6 +4,7 @@ import com.onyx.miaosha.domain.MiaoshaOrder;
 import com.onyx.miaosha.domain.MiaoshaUser;
 import com.onyx.miaosha.domain.OrderInfo;
 import com.onyx.miaosha.result.CodeMsg;
+import com.onyx.miaosha.result.Result;
 import com.onyx.miaosha.service.GoodsService;
 import com.onyx.miaosha.service.MiaoshaService;
 import com.onyx.miaosha.service.OrderService;
@@ -12,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("miaosha")
@@ -37,27 +35,28 @@ public class MiaoshaController {
      *
      *
      * @param user
-     * @param model
      * @param id
      * @return
+     * GET  是幂等的,调用多少次都是一样的结果,而且不对服务端产生影响
+     * POST是提交数据
+     *
      */
-    @RequestMapping(value = "do_miaosha",method = RequestMethod.GET)
-    public String miaoSha(MiaoshaUser user, Model model,@RequestParam("goodsId") long id){
+    @RequestMapping(value = "do_miaosha",method = RequestMethod.POST)
+    @ResponseBody
+    public Result<Object> miaoSha(MiaoshaUser user,@RequestParam("goodsId") long id){
         if(user==null){
-            return "login/to_login";
+            return Result.fail(CodeMsg.NO_USER);
         }
         //判断库存
         GoodsVo goodsVo = goodsService.getById(id);
 
         if(goodsVo.getStockCount()<1){
-            model.addAttribute("errmsg", CodeMsg.COUNT_EMPTY);
-            return "miaosha_fail";
+            return Result.fail(CodeMsg.COUNT_EMPTY);
         }
         //判断是否已经秒杀到了
         MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdGoodsId(user.getId(), id);
         if(order!=null){
-            model.addAttribute("errmsg", CodeMsg.MIAOSHA_FAIL);
-            return "miaosha_fail";
+            return Result.fail(CodeMsg.MIAOSHA_FAIL);
         }
 
         //开始秒杀,减库存
@@ -65,10 +64,7 @@ public class MiaoshaController {
         //写入秒杀订单
         OrderInfo orderInfo = miaoshaService.miaosha(user, goodsVo);
 
-        model.addAttribute("user",user);
-        model.addAttribute("orderInfo",orderInfo);
-        model.addAttribute("goods",goodsVo);
-        return "order_detail";
+        return Result.success(orderInfo);
 
     }
 
