@@ -3,6 +3,7 @@ package com.onyx.miaosha.controller;
 import com.onyx.miaosha.domain.MiaoshaOrder;
 import com.onyx.miaosha.domain.MiaoshaUser;
 import com.onyx.miaosha.domain.OrderInfo;
+import com.onyx.miaosha.redis.RedisService;
 import com.onyx.miaosha.result.CodeMsg;
 import com.onyx.miaosha.result.Result;
 import com.onyx.miaosha.service.GoodsService;
@@ -10,6 +11,7 @@ import com.onyx.miaosha.service.MiaoshaService;
 import com.onyx.miaosha.service.OrderService;
 import com.onyx.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.session.SessionProperties;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +35,8 @@ public class MiaoshaController {
      * 5000个用户...
      * 数据库的秒杀数量变成了-44.....实际上就20上商品,创建了64个订单出来....程序出错了.
      *
+     * 优化后,修正了数量的错误后,QPS是159.最后的库存变成了0
+     *
      *
      * @param user
      * @param id
@@ -48,7 +52,7 @@ public class MiaoshaController {
             return Result.fail(CodeMsg.NO_USER);
         }
         //判断库存
-        GoodsVo goodsVo = goodsService.getById(id);
+        GoodsVo goodsVo = goodsService.getById(id);// 10个  req1  req2
 
         if(goodsVo.getStockCount()<1){
             return Result.fail(CodeMsg.COUNT_EMPTY);
@@ -67,6 +71,10 @@ public class MiaoshaController {
         return Result.success(orderInfo);
 
     }
+    /**
+     * 为了防止一个用户秒杀了两个,在miaosha_order的表中建立一个userId,goodId的唯一索引
+     * 出错回滚
+     */
 
 
 
