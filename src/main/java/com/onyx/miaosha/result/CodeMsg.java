@@ -27,6 +27,7 @@ public class CodeMsg {
     public static CodeMsg  NO_ORDER= new CodeMsg(509,"订单不存在");
     public static CodeMsg  REQUEST_ILLEGAL= new CodeMsg(510,"请求非法");
     public static CodeMsg  CODE_ERROR= new CodeMsg(511,"验证码错误");
+    public static CodeMsg  ACCESS_LIMIT= new CodeMsg(512,"访问太频繁,请一分钟之后再试");
 
     //登陆模块异常....600
     //商品模块...700

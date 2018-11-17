@@ -1,26 +1,21 @@
 package com.onyx.miaosha.controller;
 
+import com.onyx.miaosha.access.AccessLimit;
 import com.onyx.miaosha.domain.MiaoshaUser;
 import com.onyx.miaosha.rabbitmq.MQSender;
 import com.onyx.miaosha.rabbitmq.MiaoshaMessage;
-import com.onyx.miaosha.redis.GoodsKey;
-import com.onyx.miaosha.redis.MiaoshaKey;
-import com.onyx.miaosha.redis.OrderKey;
-import com.onyx.miaosha.redis.RedisService;
+import com.onyx.miaosha.redis.*;
 import com.onyx.miaosha.result.CodeMsg;
 import com.onyx.miaosha.result.Result;
 import com.onyx.miaosha.service.GoodsService;
 import com.onyx.miaosha.service.MiaoshaService;
-import com.onyx.miaosha.utils.MD5Util;
-import com.onyx.miaosha.utils.UUIDUtil;
 import com.onyx.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -28,7 +23,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 @Controller
 @RequestMapping("miaosha")
@@ -107,9 +102,12 @@ public class MiaoshaController implements InitializingBean {
      *  3.ScriptEngine使用
      *
      * 3.接口的限流防刷
+     * 思路:对接口做限流,缓存中做
+     * 通过拦截器进行判断
      *
      *
      */
+    @AccessLimit(seconds=5,maxCount=10,needLogin=true)
     @RequestMapping(value = "{path}/do_miaosha",method = RequestMethod.POST)
     @ResponseBody
     public Result<Object> miaoSha(MiaoshaUser user,@RequestParam("goodsId") long id,
@@ -222,11 +220,11 @@ public class MiaoshaController implements InitializingBean {
     }
 
 
+    @AccessLimit(seconds=5,maxCount=5,needLogin=true)
     @RequestMapping(value = "path",method = RequestMethod.GET)
     @ResponseBody
-    public Result<Object> getMiaoshaPath(MiaoshaUser user,@RequestParam("goodsId")long goodsIs,
-                                         @RequestParam("verifyCode")int verifyCode){
-
+    public Result<Object> getMiaoshaPath(MiaoshaUser user, @RequestParam("goodsId")long goodsIs,
+                                         @RequestParam(value = "verifyCode",defaultValue = "0")int verifyCode){
         boolean check=miaoshaService.checkVrifyCode(user,goodsIs,verifyCode);
         if(!check){
             return Result.fail(CodeMsg.CODE_ERROR);
