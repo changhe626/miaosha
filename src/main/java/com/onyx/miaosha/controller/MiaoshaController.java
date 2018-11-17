@@ -11,15 +11,24 @@ import com.onyx.miaosha.result.CodeMsg;
 import com.onyx.miaosha.result.Result;
 import com.onyx.miaosha.service.GoodsService;
 import com.onyx.miaosha.service.MiaoshaService;
+import com.onyx.miaosha.utils.MD5Util;
+import com.onyx.miaosha.utils.UUIDUtil;
 import com.onyx.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("miaosha")
@@ -84,10 +93,33 @@ public class MiaoshaController implements InitializingBean {
      * LVS  一般到不了这个量级(千万,亿)
      *
      *
+     * 安全优化:
+     * 1.秒杀地址的隐藏,地址都是从服务器获取的
+     *  思路:秒杀开始之前,先去请求接口获取秒杀地址
+     *  1.接口改造,带上PathVariable参数
+     *  2.添加生成的地址的接口
+     *  3.秒杀收到请求,先验证PathVariable
+     *
+     * 2.数学公式验证码
+     *  思路:点击秒杀之前,先输入验证码,分散用户请求
+     *  1.添加生成验证码的接口
+     *  2.在获取秒杀路径的时候,验证验证码
+     *  3.ScriptEngine使用
+     *
+     * 3.接口的限流防刷
+     *
+     *
      */
-    @RequestMapping(value = "do_miaosha",method = RequestMethod.POST)
+    @RequestMapping(value = "{path}/do_miaosha",method = RequestMethod.POST)
     @ResponseBody
-    public Result<Object> miaoSha(MiaoshaUser user,@RequestParam("goodsId") long id){
+    public Result<Object> miaoSha(MiaoshaUser user,@RequestParam("goodsId") long id,
+                                  @PathVariable("path")String path){
+        //验证一下path
+        boolean check=miaoshaService.checkPath(user,id,path);
+        if(!check){
+            return Result.fail(CodeMsg.REQUEST_ILLEGAL);
+        }
+
         if(user==null){
             return Result.fail(CodeMsg.NO_USER);
         }
@@ -187,6 +219,44 @@ public class MiaoshaController implements InitializingBean {
         redisService.delete(MiaoshaKey.isGoodsOver);
         miaoshaService.reset(goodsList);
         return Result.success(true);
+    }
+
+
+    @RequestMapping(value = "path",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<Object> getMiaoshaPath(MiaoshaUser user,@RequestParam("goodsId")long goodsIs,
+                                         @RequestParam("verifyCode")int verifyCode){
+
+        boolean check=miaoshaService.checkVrifyCode(user,goodsIs,verifyCode);
+        if(!check){
+            return Result.fail(CodeMsg.CODE_ERROR);
+        }
+        if(user==null){
+            return Result.fail(CodeMsg.NO_USER);
+        }
+        String md5=miaoshaService.createPath(user,goodsIs);
+        return Result.success(md5);
+    }
+
+
+
+    @RequestMapping(value = "verifyCode",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<Object> verifyCode(MiaoshaUser user, @RequestParam("goodsId")long goodsIs, HttpServletResponse response){
+        if(user==null){
+            return Result.fail(CodeMsg.NO_USER);
+        }
+        BufferedImage image=miaoshaService.createVerifyCode(user,goodsIs);
+        try {
+            OutputStream stream = response.getOutputStream();
+            ImageIO.write(image,"JPEG",stream);
+            stream.flush();
+            stream.close();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Result.fail(CodeMsg.SERVER_ERROR);
+        }
     }
 
 
