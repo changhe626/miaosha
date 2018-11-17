@@ -1,6 +1,7 @@
 package com.onyx.miaosha.controller;
 
 import com.onyx.miaosha.domain.model.User;
+import com.onyx.miaosha.rabbitmq.MQSender;
 import com.onyx.miaosha.redis.RedisService;
 import com.onyx.miaosha.redis.UserKey;
 import com.onyx.miaosha.result.CodeMsg;
@@ -94,5 +95,34 @@ public class DemoController {
         return Result.success(user);
     }
 
+
+    @Autowired
+    private MQSender mqSender;
+
+    /*@GetMapping("mq")
+    @ResponseBody
+    public void   mq(){
+        mqSender.send("hello world");
+    }
+
+
+    @GetMapping("mq/topic")
+    @ResponseBody
+    public void   mqTopic(){
+        mqSender.sendTopic("hello world");
+    }
+
+    @GetMapping("mq/fanout")
+    @ResponseBody
+    public void   mqFanout(){
+        mqSender.sendFanout("hello world");
+    }
+
+
+    @GetMapping("mq/header")
+    @ResponseBody
+    public void   mqHeader(){
+        mqSender.sendHeaders("hello world");
+    }*/
 
 }

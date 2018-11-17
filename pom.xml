@@ -38,6 +38,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
         <!-- 配置 spring.thymeleaf.mode=LEGACYHTML5  html语法不严格检查的-->
         <dependency>
             <groupId>net.sourceforge.nekohtml</groupId>

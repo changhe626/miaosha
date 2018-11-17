@@ -26,9 +26,21 @@ public class GoodsService {
         return goodsDao.getGoodsVoByGoodsId(id);
     }
 
-    public void reduceStock(GoodsVo goods) {
+    //添加判断是否下单成功了...
+    public boolean reduceStock(GoodsVo goods) {
         MiaoshaGoods g = new MiaoshaGoods();
         g.setGoodsId(goods.getId());
-        goodsDao.reduceStock(g);//1个的时候
+        int stock = goodsDao.reduceStock(g);//1个的时候
+        return stock>0;
+    }
+
+    public void resetStock(List<GoodsVo> goodsList) {
+        for(GoodsVo goods : goodsList ) {
+            MiaoshaGoods g = new MiaoshaGoods();
+            g.setGoodsId(goods.getId());
+            g.setStockCount(goods.getStockCount());
+            goodsDao.resetStock(g);
+        }
+
     }
 }

@@ -1,0 +1,46 @@
+安装erlang,从源码进行安装:
+
+yum install ncurses-devel
+
+解压erlang源码
+tar xf ....tar.gz
+
+./configure --prefix=/usr/local/erlang20 --enable-hipe --enable-threads --enable-smp-support --enable-kernel-poll --enable-without-javac
+
+make && make install
+
+验证是否安装成功了
+cd /usr/local/erlang20/bin
+
+./erl  进入命令行
+
+
+安装rabbitMQ
+安装 python:   yum  install  python -y
+安装simplejson:  yum install  xmlto -y
+ yum install python-simplejson  -y
+解压   xz -d rabbitmq-server-generic-unix-3.7.8.tar.xz
+解压出来是个tar文件,再解压
+tar  xf  rabbitmq-server-generic-unix-3.7.8.tar
+
+mv rabbitmq_server-3.7.8/  /usr/local/rabbitmq
+
+进入sbin 目录
+
+
+启动rabbitMQ
+
+1.
+./rabbitmq-server 启动rabbitmq  sever
+2.
+netstat  -nap| grep   5672
+
+
+启动不了?
+vi /etc/profile
+
+export  PATH=$PATH:/usr/local/erlang20/bin:/usr/local/rabbitmq/sbin
+
+source /etc/profile
+
+就可以启动rabbitMQ了
