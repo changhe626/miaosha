@@ -34,7 +34,11 @@ public abstract  class BasePrefix  implements KeyPrefix{
     @Override
     public String getPrefix() {
         String simpleName = getClass().getSimpleName();
-        return simpleName+":"+prefix;
+        StringBuffer sb = new StringBuffer(simpleName);
+        sb.append(":");
+        sb.append(prefix);
+        sb.append(":");
+        return sb.toString();
     }
 
 
